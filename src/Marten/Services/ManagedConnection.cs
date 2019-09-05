@@ -398,9 +398,9 @@ namespace Marten.Services
         }
     }
 
-    public static class PostgresErrorCodes
-    {
-        public const string SerializationFailure = "40001";
-        public const string FunctionDoesNotExist = "42883";
-    }
+    // public static class PostgresErrorCodes
+    // {
+    //     public const string SerializationFailure = "40001";
+    //     public const string FunctionDoesNotExist = "42883";
+    // }
 }

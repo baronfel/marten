@@ -120,14 +120,20 @@ namespace Marten.Services
 
         public void Rollback()
         {
-            if (Transaction != null && !Transaction.IsCompleted && _mode != CommandRunnerMode.External)
+            if (Transaction != null && _mode != CommandRunnerMode.External)
             {
                 try
                 {
-                    Transaction?.Rollback();
-                    Transaction?.Dispose();
+                    Transaction.Rollback();
+#if !NET461 && !NETSTANDARD2_0
+                    await Transaction.DisposeAsync();
+#else
+                    Transaction.Dispose();
+#endif
                     Transaction = null;
                 }
+                catch (ObjectDisposedException e) { }
+                catch (InvalidOperationException e) { }
                 catch (Exception e)
                 {
                     throw new RollbackException(e);
@@ -141,14 +147,21 @@ namespace Marten.Services
 
         public async Task RollbackAsync(CancellationToken token)
         {
-            if (Transaction != null && !Transaction.IsCompleted && _mode != CommandRunnerMode.External)
+            if (Transaction != null && _mode != CommandRunnerMode.External)
             {
                 try
                 {
                     await Transaction.RollbackAsync(token).ConfigureAwait(false);
+#if !NET461 && !NETSTANDARD2_0
+                    await Transaction.DisposeAsync();
+#else
                     Transaction.Dispose();
+#endif
                     Transaction = null;
+
                 }
+                catch (ObjectDisposedException e) { }
+                catch (InvalidOperationException e) { }
                 catch (Exception e)
                 {
                     throw new RollbackException(e);
